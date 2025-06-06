@@ -1,0 +1,11 @@
+{
+  "name": "Subtitle Translator",
+  "context": "..",
+  "dockerFile": "../Dockerfile",
+  "workspaceFolder": "/app",
+  "mounts": [
+	"source=${localWorkspaceFolder},target=/app,type=bind",
+	"source=${localWorkspaceFolder}/test_data,target=/data,type=bind"
+  ],
+  "runArgs": ["--env-file", "../.env"]
+}
