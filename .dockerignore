@@ -3,3 +3,5 @@ test_data/
 .gitignore
 .env
 .devcontainer/
+src/__pycache__/
+*.py[cod]
