@@ -7,5 +7,5 @@
 	"source=${localWorkspaceFolder},target=/app,type=bind",
 	"source=${localWorkspaceFolder}/test_data,target=/data,type=bind"
   ],
-  "runArgs": ["--env-file", "/mnt/c/Users/rapha/Documents/autoTranslateSubtitles/.env"]
+  "runArgs": ["--env-file", "${localWorkspaceFolder}/.env"]
 }
