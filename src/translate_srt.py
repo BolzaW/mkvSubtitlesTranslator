@@ -1,15 +1,30 @@
-import argparse
 import os
+import random
 import re
 import pysrt
 import deepl
 import time
 
-# 🗝️ Clé API DeepL
-DEEPL_API_KEY = ""
-translator = deepl.Translator(DEEPL_API_KEY)
 
-def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR"):
+def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", keys_api_list=None):
+    
+    # Gestion de l'API Deepl
+    translators = []
+    if not keys_api_list and not is_dry_run:
+        print("Pas de clés pour démarrer l'API Deepl")
+        return
+
+    if keys_api_list and not is_dry_run:
+
+        for key in  keys_api_list:
+            try:
+                translator = deepl.Translator(key)
+                translators.append(translator)
+            except deepl.DeepLException:
+                print(f"Clé DeepL {key} invalide!")
+            
+        print(f"{len(translators)} clés utilisés pour DeepL")
+
 
     # 🔍 Lire le fichier avec pysrt
     if not os.path.isfile(input_file):
@@ -35,7 +50,7 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR"):
                     #print(f"Traduction de '{sub.text}' en cours ...")
                     count += 1
                     total_sent_chars += len(sub.text) # type: ignore
-
+                    translator = random.choice(translators)
                     result = translator.translate_text(
                         sub.text, # type: ignore
                         source_lang="EN",
@@ -49,9 +64,10 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR"):
 
                 except deepl.QuotaExceededException:
                     print()
-                    print("❌ Quota DeepL dépassé.")
-                    stop_translation = True
-                    break
+                    print(f"❌ Quota DeepL dépassé")
+                    translators.remove(translator) # type: ignore
+                    attempts += 1
+                    count -= 1
                 except deepl.TooManyRequestsException:
                     attempts += 1
                     count -= 1

@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-def add_subtitle_to_mkv(mkv_file, srt_file, output_file=None, language='fre', track_name='French Subs'):
+def add_subtitle_to_mkv(mkv_file, srt_file, output_file=None, language='FR', track_name='French Subs'):
     if not os.path.isfile(mkv_file):
         raise FileNotFoundError(f"MKV file not found: {mkv_file}")
     if not os.path.isfile(srt_file):

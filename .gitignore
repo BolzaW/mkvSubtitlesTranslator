@@ -1,2 +1,4 @@
 test_data/
 .env
+__pycache__/
+*.py[cod]
