@@ -39,7 +39,7 @@ def main():
         count += 1
         input_file = os.path.join(data_path, file)
         output_file = os.path.join(data_path, os.path.splitext(file)[0] + "_vostfr.mkv")
-        print(f"{input_file} {count}/{len(list_mkv_files)} Traduction des sous-titres du fichier")
+        print(f"{count}/{len(list_mkv_files)} - Traduction du fichier : {input_file}")
                
         with tempfile.TemporaryDirectory() as tmpdir:
             extracted_srt = os.path.join(tmpdir, "extracted.srt")
@@ -55,8 +55,11 @@ def main():
             translate_srt.translate_srt_file(
                 input_file=extracted_srt,
                 output_file=translated_srt,
+                origin_lang=origin_lang,
                 target_lang=target_lang,
                 is_dry_run=is_dry_run,
+                is_cleanup_subtitles=cleanup_subtitles,
+                is_cleanup_songs=cleanup_songs,
                 keys_api_list=list_api_keys
             )
             if keep_srt_files:
@@ -72,6 +75,11 @@ def main():
             )
 
             print("✅ Terminé ! Fichier final :", output_file)
+
+            if overwrite_files:
+                print("⚠️ Étape 4 : Suppression du fichier MKV source...")
+                os.remove(input_file)
+
 
 if __name__ == "__main__":
     main()

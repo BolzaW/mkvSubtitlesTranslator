@@ -6,7 +6,8 @@ import deepl
 import time
 
 
-def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", keys_api_list=None):
+def translate_srt_file(input_file, output_file, is_dry_run, origin_lang="EN",target_lang="FR",
+                        keys_api_list=None, is_cleanup_subtitles=True, is_cleanup_songs=True):
     
     # Gestion de l'API Deepl
     translators = []
@@ -36,7 +37,8 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", ke
             raise FileNotFoundError(f"SRT file not found: {input_file}")
     subs = pysrt.open(input_file, encoding='utf-8')
 
-    subs = cleanup_subtitle(subs)
+    if is_cleanup_subtitles:
+        subs = cleanup_subtitles(subs, is_cleanup_songs)
 
     total_sent_chars = 0
 
@@ -58,7 +60,7 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", ke
                     translator = random.choice(translators)
                     result = translator.translate_text(
                         sub.text, # type: ignore
-                        source_lang="EN",
+                        source_lang=origin_lang,
                         target_lang=target_lang
                     )
                     sub.text = result
@@ -104,7 +106,7 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", ke
     subs.save(output_file, encoding='utf-8')
     print(f"✅ Fichier traduit sauvegardé : {output_file}")
 
-def cleanup_subtitle(subs, clean_music=True):
+def cleanup_subtitles(subs, clean_music=True):
 # Nettoyage des sous-titres : suppression ou simplification
     cleaned_subs = []
     for sub in subs:
