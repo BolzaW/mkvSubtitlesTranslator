@@ -11,7 +11,7 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", ke
     # Gestion de l'API Deepl
     translators = []
     if not keys_api_list and not is_dry_run:
-        print("Pas de clés pour démarrer l'API Deepl")
+        print("Pas de clés pour démarrer l'API DeepL")
         return
 
     if keys_api_list and not is_dry_run:
@@ -19,11 +19,16 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", ke
         for key in  keys_api_list:
             try:
                 translator = deepl.Translator(key)
+                translator.translate_text(
+                        text="Hi",
+                        source_lang="EN",
+                        target_lang="FR"
+                    )
                 translators.append(translator)
-            except deepl.DeepLException:
-                print(f"Clé DeepL {key} invalide!")
+            except deepl.DeepLException as e:
+                print(f"Clé DeepL {key} invalide! {e}")
             
-        print(f"{len(translators)} clés utilisés pour DeepL")
+        print(f"{len(translators)} clé(s) utilisée(s) pour DeepL")
 
 
     # 🔍 Lire le fichier avec pysrt
@@ -68,6 +73,10 @@ def translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR", ke
                     translators.remove(translator) # type: ignore
                     attempts += 1
                     count -= 1
+                    if not translators:
+                        stop_translation = True
+                        print(f"❌ Plus de clés disponnible, arrêt de la traduction")
+                        break
                 except deepl.TooManyRequestsException:
                     attempts += 1
                     count -= 1
@@ -144,7 +153,7 @@ def cleanup_subtitle(subs, clean_music=True):
 # test
 if __name__ == "__main__":
 
-    input_file = "/app/samples/srt/test.srt"
-    output_file = "/app/samples/srt_fr/test.srt"
-    is_dry_run = True
-    translate_srt_file(input_file, output_file, is_dry_run)
+    input_file = "/data/sample.srt"
+    output_file = "/data/sample.srt"
+    is_dry_run = False
+    translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR")

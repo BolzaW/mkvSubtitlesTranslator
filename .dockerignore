@@ -5,3 +5,4 @@ test_data/
 .devcontainer/
 src/__pycache__/
 *.py[cod]
+*.tar

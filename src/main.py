@@ -19,7 +19,7 @@ def main():
     is_dry_run = os.getenv("DRY_RUN", "true").lower() == "true"
     origin_lang = os.getenv("ORIGIN_LANG", "EN").upper()
     target_lang = os.getenv("TARGET_LANG", "FR").upper()
-    list_api_keys = [key.strip() for key in os.getenv("OVERWRITE_FILES", "default").split(",") if key.strip()]
+    list_api_keys = [key.strip() for key in os.getenv("DEEPL_API_KEYS", "default").split(",") if key.strip()]
 
     # Création de la liste de fichiers mkv à traduire
     list_mkv_files = [
@@ -39,7 +39,7 @@ def main():
         count += 1
         input_file = os.path.join(data_path, file)
         output_file = os.path.join(data_path, os.path.splitext(file)[0] + "_vostfr.mkv")
-        print(f"Traduction des sous-titres du fichier {input_file} {count}/{len(list_mkv_files)}")
+        print(f"{input_file} {count}/{len(list_mkv_files)} Traduction des sous-titres du fichier")
                
         with tempfile.TemporaryDirectory() as tmpdir:
             extracted_srt = os.path.join(tmpdir, "extracted.srt")
@@ -56,7 +56,8 @@ def main():
                 input_file=extracted_srt,
                 output_file=translated_srt,
                 target_lang=target_lang,
-                is_dry_run=is_dry_run
+                is_dry_run=is_dry_run,
+                keys_api_list=list_api_keys
             )
             if keep_srt_files:
                 shutil.copy2(translated_srt,os.path.join(data_path, os.path.splitext(file)[0] + ".fr.srt"))
