@@ -7,7 +7,7 @@ RUN apt update && apt install -y mkvtoolnix mkvtoolnix-gui
 WORKDIR /app
 
 # Copy source code
-COPY src/ ./src/
+COPY src/ ./
 
 # Install Python deps
 COPY requirements.txt .

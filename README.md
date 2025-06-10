@@ -120,7 +120,6 @@ ORIGIN_LANG=EN
 
 - **TARGET_LANG** Spécifie la langue désirée pour la traduction
 ```bash
-```bash
 TARGET_LANG=FR
 ```
 

@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  subtitle-translator:
+    image: mkv-subtitles-translator:latest
+    container_name: subtitle-translator
+    environment:
+      - DEEPL_API_KEYS=${DEEPL_API_KEYS}
+      - OVERWRITE_FILES=false
+      - KEEP_SRT_FILES=false
+      - CLEANUP_SUBTITLES=true
+      - CLEANUP_SONGS_SUBTITLES=true
+      - DRY_RUN=true
+      - ORIGIN_LANG=EN
+      - TARGET_LANG=FR
+    secrets:
+      - deepl_api_keys
+    volumes:
+      - /mnt/mes_videos:/data
+    command: ["python", "main.py"]
+    restart: "no"

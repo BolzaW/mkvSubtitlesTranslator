@@ -1,4 +1,5 @@
 test_data/
+samples/
 .git/
 .gitignore
 .env
@@ -6,3 +7,4 @@ test_data/
 src/__pycache__/
 *.py[cod]
 *.tar
+README.md
