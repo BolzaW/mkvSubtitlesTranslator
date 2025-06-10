@@ -13,8 +13,6 @@ services:
       - DRY_RUN=true
       - ORIGIN_LANG=EN
       - TARGET_LANG=FR
-    secrets:
-      - deepl_api_keys
     volumes:
       - /mnt/mes_videos:/data
     command: ["python", "main.py"]
