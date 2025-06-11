@@ -1,6 +1,12 @@
 # 🎬 MKV Subtitles Translator
 
-Ce projet permet de **traduire automatiquement les sous-titres** d'une ou plusieurs vidéos `.mkv` en utilisant l'API DeepL et les outils mkvtoolnix et mkvtoolnix-gui
+Ce projet permet de **traduire automatiquement les sous-titres** d'une ou plusieurs vidéos `.mkv` en utilisant l'API DeepL et les outils mkvtoolnix et mkvtoolnix-gui, le tout embarqué dans un container docker pour la portabilité et ne pas à avoir à installer des dépendances sur votre machine.
+
+## 🚧 Projet en développement
+
+Le projet est encore récent et peut comporter des bus. La gestion des cas d'erreur n'est pas faite dans les règles de l'art. Faites une copie de vos données avant de l'utiliser.
+
+Note : Les variables d'environnement par défaut évitent d'altérer vos fichiers sources. Tant que le code n'est pas stabilisé, il est vivement déconseillé de modifier leurs valeurs autrement que pour des objectifs de test.
 
 ## 🚀 Fonctionnalités
 - Extraction des sous-titres intégrés aux fichiers `.mkv`
@@ -27,12 +33,13 @@ Ils doivent disposer d'une piste de sous-titre intégrée.
 
 ### 📦 Pré-Requis
 
-Le projet est une image docker contenant un script python ainsi que les utilitaires mkvtoolnix mkvtoolnix-gui.
-Je ne souhaite pas à ce stade du projet publier l'image sur docker hub, il faut donc build l'image docker en local
+Le projet est une image docker, pour l'instant elle n'est pas publiée sur docker hub, il faut donc la build localement.
 
-Docker et Docker Compose installés.
+Note : une version de cette image déjà build est disponnible en tant que release, mais je ne m'engage pas à ce qu'elle soit à jour. Il est donc recommandé de la construire soit même.
 
-Executer la commande suivante à la racine du projet :
+Docker et Docker Compose doivent être installés.
+
+Cloner le projet puis executer la commande suivante à la racine du projet :
 ```bash
 docker build -t mkv-subtitles-translator:latest .
 ```
