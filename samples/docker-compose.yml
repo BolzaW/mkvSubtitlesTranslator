@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   subtitle-translator:
     image: mkv-subtitles-translator:latest
@@ -15,5 +13,4 @@ services:
       - TARGET_LANG=FR
     volumes:
       - /mnt/mes_videos:/data
-    command: ["python", "main.py"]
     restart: "no"

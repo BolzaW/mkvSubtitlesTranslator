@@ -41,7 +41,7 @@ docker build -t mkv-subtitles-translator:latest .
 Si vous voulez déplacer le container sur une autre machine.
 Vous pouvez créer une archive portable grâce à la commande :
 ```bash
-docker save -o mkv-subtitles-translator.tar mkv-subtiles-translator:latest
+docker save -o mkv-subtitles-translator.tar mkv-subtitles-translator:latest
 ```
 Puis copier l'archive sur une autre machine et utiliser la commande :
 ```bash

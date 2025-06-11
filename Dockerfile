@@ -12,3 +12,6 @@ COPY src/ ./
 # Install Python deps
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
+# Run main.py with no buffering for stdout
+CMD ["python", "-u", "main.py"]
