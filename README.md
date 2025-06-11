@@ -4,7 +4,7 @@ Ce projet permet de **traduire automatiquement les sous-titres** d'une ou plusie
 
 ## 🚧 Projet en développement
 
-Le projet est encore récent et peut comporter des bus. La gestion des cas d'erreur n'est pas faite dans les règles de l'art. Faites une copie de vos données avant de l'utiliser.
+Le projet est encore récent et peut comporter des bugs. La gestion des cas d'erreur n'est pas faite dans les règles de l'art. Faites une copie de vos données avant de l'utiliser.
 
 Note : Les variables d'environnement par défaut évitent d'altérer vos fichiers sources. Tant que le code n'est pas stabilisé, il est vivement déconseillé de modifier leurs valeurs autrement que pour des objectifs de test.
 
