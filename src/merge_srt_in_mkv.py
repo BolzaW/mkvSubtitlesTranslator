@@ -23,10 +23,3 @@ def add_subtitle_to_mkv(mkv_file, srt_file, output_file=None, language='FR', tra
     print("Running command:", " ".join(command))
     subprocess.run(command, check=True)
     print(f"Subtitles added successfully to: {output_file}")
-
-# test
-if __name__ == "__main__":
-    mkv_file = "/app/samples/mkv/test.mkv"
-    srt_file = "/app/samples/srt_fr/test.srt"
-    output_file = "/app/samples/mkv_fr/test.mkv"
-    add_subtitle_to_mkv(mkv_file, srt_file, output_file)

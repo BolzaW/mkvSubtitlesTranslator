@@ -31,7 +31,7 @@ def extract_subtitle(mkv_file_str, output_file_str=None):
     if result.returncode != 0:
         raise RuntimeError(f"Erreur lors de l'exécution de mkvmerge (code {result.returncode}):\n{result.stderr.strip()}") 
     
-    print(f"Info : {result}")
+    print(f"Info : {result.stdout}")
 
     # Récupérer l'ID de la première piste de sous-titre
     # TODO gérer plusieurs pistes de sous titre
@@ -53,9 +53,3 @@ def extract_subtitle(mkv_file_str, output_file_str=None):
         str(mkv_file),
         f"{subtitle_track_id}:{str(output_file)}"
     ])
-
-#Test
-if __name__ == "__main__":
-    mkv_file_str = "/app/samples/mkv/test.mkv"
-    output_file_str = "/app/samples/srt/test.srt"
-    extract_subtitle(mkv_file_str, output_file_str)

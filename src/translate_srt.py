@@ -151,11 +151,3 @@ def cleanup_subtitles(subs, clean_music=True):
         cleaned_subs.append(sub)
 
     return pysrt.SubRipFile(items=cleaned_subs)
-
-# test
-if __name__ == "__main__":
-
-    input_file = "/data/sample.srt"
-    output_file = "/data/sample.srt"
-    is_dry_run = False
-    translate_srt_file(input_file, output_file, is_dry_run, target_lang="FR")
