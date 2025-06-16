@@ -3,13 +3,19 @@ from pathlib import Path
 import subprocess
 
 def extract_subtitle(mkv_file_str, output_file_str=None):
+    # Gestion du fichier source
     if not os.path.isfile(mkv_file_str):
         raise FileNotFoundError(f"MKV file not found: {mkv_file_str}")
+    
+    if os.path.splitext(mkv_file_str)[1].lower() != ".mkv":
+        raise ValueError(f"File {mkv_file_str} not supported")
+    
     mkv_file = Path(mkv_file_str)
 
+    # Gestion du nom du fichier de sortie
     if output_file_str is None:
-        base, ext = os.path.splitext(mkv_file)
-        output_file_str = f"{base}_vostfr{ext}"
+        base = os.path.splitext(mkv_file)[0]
+        output_file_str = f"{base}.srt"
         output_file = Path(output_file_str)
     else :
         output_file = Path(output_file_str)
@@ -22,6 +28,9 @@ def extract_subtitle(mkv_file_str, output_file_str=None):
         stderr=subprocess.PIPE,
         text=True
     )
+    if result.returncode != 0:
+        raise RuntimeError(f"Erreur lors de l'exécution de mkvmerge (code {result.returncode}):\n{result.stderr.strip()}") 
+    
     print(f"Info : {result}")
 
     # Récupérer l'ID de la première piste de sous-titre
@@ -36,8 +45,7 @@ def extract_subtitle(mkv_file_str, output_file_str=None):
                 break
 
     if subtitle_track_id == -1:
-        print(f"⚠️  Aucun sous-titre trouvé dans {mkv_file.name}")
-        return
+        raise ValueError(f"No subtitles tracks found in file : {mkv_file_str}")
 
     print(f"📤 Extraction piste {subtitle_track_id} -> {output_file.name}")
     subprocess.run([
