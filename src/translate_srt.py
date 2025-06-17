@@ -10,97 +10,68 @@ def translate_srt_file(input_file, output_file, is_dry_run, origin_lang="EN",tar
                         keys_api_list=None, is_cleanup_subtitles=True, is_cleanup_songs=True):
     
     # Gestion de l'API Deepl
-    translators = []
+    valid_keys = []
     if not keys_api_list and not is_dry_run:
-        print("Pas de clés pour démarrer l'API DeepL")
-        return
+        raise ValueError("Pas de clés pour démarrer l'API DeepL")
 
     if keys_api_list and not is_dry_run:
-
-        for key in  keys_api_list:
-            try:
-                translator = deepl.Translator(key)
-                translator.translate_text(
-                        text="Hi",
-                        source_lang="EN",
-                        target_lang="FR"
-                    )
-                translators.append(translator)
-            except deepl.DeepLException as e:
-                print(f"Clé DeepL {key} invalide! {e}")
-            
-        print(f"{len(translators)} clé(s) utilisée(s) pour DeepL")
-
-
+        valid_keys = test_api_keys(keys_api_list)
+        if not valid_keys :
+            raise ValueError("Pas de clés valides pour démarrer l'API DeepL")
+        
     # 🔍 Lire le fichier avec pysrt
     if not os.path.isfile(input_file):
-            raise FileNotFoundError(f"SRT file not found: {input_file}")
+        raise FileNotFoundError(f"SRT file not found: {input_file}")
     subs = pysrt.open(input_file, encoding='utf-8')
 
     if is_cleanup_subtitles:
         subs = cleanup_subtitles(subs, is_cleanup_songs)
 
+    
     total_sent_chars = 0
-
-    if not is_dry_run:
-
-        stop_translation = False
-        count = 0
+    list_subs_text = []
+    for sub in subs:
+        total_sent_chars += len(sub.text)
+        list_subs_text.append(sub.text)
         
-        for sub in subs:
-            max_retries = 3
-            attempts = 0
+    if not is_dry_run:
+        print(f"{total_sent_chars} caractères vont être envoyés à DeepL")
+       
+        key_index = 0
+        tentative = 0
+        is_translation_successful = False
+        
+        while (tentative < 3 and not is_translation_successful):
 
-            # Traduction avec retry en cas d'erreur
-            while attempts < max_retries:
-                try:
-                    #print(f"Traduction de '{sub.text}' en cours ...")
-                    count += 1
-                    total_sent_chars += len(sub.text) # type: ignore
-                    translator = random.choice(translators)
-                    result = translator.translate_text(
-                        sub.text, # type: ignore
-                        source_lang=origin_lang,
-                        target_lang=target_lang
-                    )
-                    sub.text = result
-                    attempts = 0
-                    # print(f"Traduction de '{sub.text}' en '{result.text}'")
-                    print(f"\rTraduction: {count}/{len(subs)}  Nombre de caractères envoyés: {total_sent_chars}", end="", flush=True)
-                    break
+            # Call deepL API
+            translator = deepl.Translator(valid_keys[key_index])
 
-                except deepl.QuotaExceededException:
-                    print()
-                    print(f"❌ Quota DeepL dépassé")
-                    translators.remove(translator) # type: ignore
-                    attempts += 1
-                    count -= 1
-                    if not translators:
-                        stop_translation = True
-                        print(f"❌ Plus de clés disponnible, arrêt de la traduction")
-                        break
-                except deepl.TooManyRequestsException:
-                    attempts += 1
-                    count -= 1
-                    print()
-                    print(f"❌ DeepL surchargé. Essai {attempts}/{max_retries}. Retry dans 1s")
-                    time.sleep(1)
-                except Exception as e:
-                    print()
-                    print(f"⚠️ Erreur lors de la traduction : {e}")
-                    stop_translation = True
-                    break
-
-            if stop_translation:
-                break
-        print()
-        print(f"🔢 Total de caractères envoyés à DeepL : {total_sent_chars}")
-
-    else:
-        for sub in subs:
-            total_sent_chars += len(sub.text) 
+            try:     
+                result = translator.translate_text(
+                            list_subs_text,
+                            source_lang=origin_lang,
+                            target_lang=target_lang
+                        )
+                is_translation_successful = True
             
-        print(f"🔢 Total de caractères du fichier srt : {total_sent_chars}")
+            except deepl.QuotaExceededException:
+                print(f"❌ Quota DeepL dépassé")
+                key_index += 1
+                tentative += 1
+                
+            except deepl.TooManyRequestsException:
+                tentative += 1
+                print(f"❌ DeepL surchargé. Essai {tentative}/3. Retry dans 1s")
+                time.sleep(1)
+            
+            except deepl.DeepLException as e:
+                tentative += 1
+                print(f"❌ Erreur DeepL innatendue : {e}. Essai {tentative}/3. Retry dans 1s")
+
+        if not is_translation_successful:
+            raise RuntimeError("La traduction DeepL a échoué")
+    else:
+        print(f"{total_sent_chars} caractères auraient du être envoyés à DeepL (DRY RUN)")
 
     # 💾 Sauvegarder
     subs.save(output_file, encoding='utf-8')
@@ -151,3 +122,22 @@ def cleanup_subtitles(subs, clean_music=True):
         cleaned_subs.append(sub)
 
     return pysrt.SubRipFile(items=cleaned_subs)
+
+def test_api_keys(key_list):
+    valid_keys = []
+    
+    for key in  key_list:
+        try:
+            translator = deepl.Translator(key)
+            translator.translate_text(
+                    text="Hi",
+                    source_lang="EN",
+                    target_lang="FR"
+                )
+            valid_keys.append(key)
+        except deepl.DeepLException as e:
+            print(f"Clé DeepL {key} invalide! {e}")
+    
+    return valid_keys
+
+    

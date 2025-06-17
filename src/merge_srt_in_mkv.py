@@ -21,5 +21,8 @@ def add_subtitle_to_mkv(mkv_file, srt_file, output_file=None, language='FR', tra
     ]
 
     print("Running command:", " ".join(command))
-    subprocess.run(command, check=True)
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Erreur lors de l'execution de mkvmerge : {e}")
     print(f"Subtitles added successfully to: {output_file}")
