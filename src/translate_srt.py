@@ -19,7 +19,7 @@ def translate_srt_file(input_file, output_file, is_dry_run, origin_lang="EN",tar
         if not valid_keys :
             raise ValueError("Pas de clés valides pour démarrer l'API DeepL")
         
-    # 🔍 Lire le fichier avec pysrt
+    # Lire le fichier avec pysrt
     if not os.path.isfile(input_file):
         raise FileNotFoundError(f"SRT file not found: {input_file}")
     subs = pysrt.open(input_file, encoding='utf-8')
@@ -47,12 +47,21 @@ def translate_srt_file(input_file, output_file, is_dry_run, origin_lang="EN",tar
             translator = deepl.Translator(valid_keys[key_index])
 
             try:     
-                result = translator.translate_text(
+                list_trad = translator.translate_text(
                             list_subs_text,
                             source_lang=origin_lang,
-                            target_lang=target_lang
+                            target_lang=target_lang,
+                            model_type="prefer_quality_optimized",
+                            preserve_formatting=True
                         )
+                translator.translate_text
                 is_translation_successful = True
+
+                if isinstance(list_trad, list) and (len(list_trad) == len(list_subs_text)) :
+                    for i in range(len(list_trad)):
+                        subs[i].text = list_trad[i].text
+                else :
+                    raise ValueError(f"❌ Traduction incohérente de DeepL : {len(list_subs_text)} éléments en entrée vs {len(list_subs_text)} en sortie")
             
             except deepl.QuotaExceededException:
                 print(f"❌ Quota DeepL dépassé")
@@ -103,13 +112,15 @@ def cleanup_subtitles(subs, clean_music=True):
             text = re.sub(r"♪.{3,}?♪♪", "", text, flags=re.DOTALL)
             text = re.sub(r"♪.{3,}?♪", "", text, flags=re.DOTALL)
 
+        # Cas 5 - Nettoyage des espaces superflux :
+        text = re.sub(r"  ", " ", text)
 
-        # Cas 5 — Supprimer les lignes sans alphanumérique
+        # Cas 6 — Supprimer les lignes sans alphanumérique
         lines = text.splitlines()
         lines = [line for line in lines if re.search(r"[A-Za-z0-9]", line)]
         text = "\n".join(lines)
 
-        # Cas 6 — Si tout le texte est encore vide ou sans alphanumérique
+        # Cas 7 — Si tout le texte est encore vide ou sans alphanumérique
         if not re.search(r"[A-Za-z0-9]", text):
             continue
 
