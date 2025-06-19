@@ -5,8 +5,8 @@ import deepl
 from bs4 import BeautifulSoup
 import time
 
-def translate_srt_file(input_file, output_file, is_dry_run, origin_lang="EN",target_lang="FR",
-                        keys_api_list=None, is_cleanup_subtitles=True, is_cleanup_songs=True):
+def translate_srt_file(input_file, output_file, is_dry_run, keys_api_list=None, origin_lang="EN",target_lang="FR",
+                        is_cleanup_subtitles=True, is_cleanup_songs=True):
     
     # Gestion de l'API Deepl
     valid_keys = []
@@ -47,7 +47,8 @@ def translate_srt_file(input_file, output_file, is_dry_run, origin_lang="EN",tar
                             source_lang=origin_lang,
                             target_lang=target_lang,
                             model_type="prefer_quality_optimized",
-                            tag_handling="xml"
+                            tag_handling="xml",
+                            context="Subtitles of a movie or TV show"
                         )
                 
                 xml_trads = result.text # type: ignore

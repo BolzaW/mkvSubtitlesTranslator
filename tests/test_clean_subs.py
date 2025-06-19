@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 from translate_srt import translate_srt_file, cleanup_subtitles
 
-class TestTranslateSubtitles(unittest.TestCase):
+class TestCleanSubtitles(unittest.TestCase):
     srt_file_to_clean = "/app/test_data/mkv_to_srt/toclean.srt"
     expected_srt_file = "/app/test_data/mkv_to_srt/clean.srt"
     expected_srt_file_with_songs = "/app/test_data/mkv_to_srt/clean_with_songs.srt"
@@ -29,7 +29,6 @@ class TestTranslateSubtitles(unittest.TestCase):
         self.assertEqual(len(clean_subs), len(expected_subs), "Le fichier nettoyé devrait être aussi long que le fichier attendu")
         for i in range(len(clean_subs)):
             self.assertEqual(clean_subs[i].text, expected_subs[i].text, "Le texte du fichier nettoyé devrait être égal au texte du fichier attendu")
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -19,7 +19,7 @@ def main():
     is_dry_run = os.getenv("DRY_RUN", "true").lower() == "true"
     origin_lang = os.getenv("ORIGIN_LANG", "EN").upper()
     target_lang = os.getenv("TARGET_LANG", "FR").upper()
-    list_api_keys = [key.strip() for key in os.getenv("DEEPL_API_KEYS", "default").split(",") if key.strip()]
+    list_api_keys = [key.strip() for key in os.getenv("DEEPL_API_KEYS", "").split(",") if key.strip()]
 
     # Création de la liste de fichiers mkv à traduire
     list_mkv_files = [
