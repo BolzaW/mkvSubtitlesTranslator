@@ -81,7 +81,6 @@ def translate_srt_file(input_file, output_file, is_dry_run, keys_api_list=None, 
 
     # 💾 Sauvegarder
     subs.save(output_file, encoding='utf-8')
-    print(f"✅ Fichier traduit sauvegardé : {output_file}")
 
 def cleanup_subtitles(subs, clean_music=True):
 # Nettoyage des sous-titres : suppression ou simplification

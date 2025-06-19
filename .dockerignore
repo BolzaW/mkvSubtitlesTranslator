@@ -9,3 +9,4 @@ src/__pycache__/
 *.py[cod]
 *.tar
 README.md
+create_container_archive.sh
