@@ -121,7 +121,7 @@ def process_srt_files(list_srt_files):
 
         print("🌐 Traduction avec DeepL..." + (" (simulation)" if is_dry_run else ""))
         translate_srt.translate_srt_file(
-            input_file=file,
+            input_file=os.path.join(data_path,file),
             output_file=output_srt_file,
             origin_lang=origin_lang,
             target_lang=target_lang,

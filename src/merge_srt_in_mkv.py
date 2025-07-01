@@ -12,17 +12,22 @@ def add_subtitle_to_mkv(mkv_file, srt_file, output_file=None, language='FR', tra
         output_file = f"{base}_vostfr{ext}"
    
     command = [
-        "mkvmerge",
-        "-o", output_file,
-        mkv_file,
-        "--language", f"0:{language}",
-        "--track-name", f"0:{track_name}",
-        srt_file
+        "ffmpeg",
+        "-i", mkv_file,
+        "-i", srt_file,
+        "-map", "0",
+        "-map", "1:0",
+        "-c", "copy", 
+        "-c:s", "srt",
+        # TODO Add metadata -> besoin de connaitre le nouvel index de la piste de sous-titre
+        # "-metadata:s:s:?", "language=FR",
+        # "-metadata:s:s:?", "title=Français (traduit)",
+        output_file
     ]
 
     print("Running command:", " ".join(command))
     try:
         subprocess.run(command, check=True)
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Erreur lors de l'execution de mkvmerge : {e}")
+        raise RuntimeError(f"Erreur lors de l'execution de ffmpeg : {e}")
     print(f"Subtitles added successfully to: {output_file}")

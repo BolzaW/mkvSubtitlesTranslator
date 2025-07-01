@@ -22,47 +22,57 @@ class TestMergeSubtitles(unittest.TestCase):
     def test_merge_1srt_in_1mkv(self):
         """Teste la fonction de merge (nominal)"""
         add_subtitle_to_mkv(self.mkv_test_file_path, self.srt_file_path)
-        self.assertTrue(os.path.isfile(self.output_mkv), "Le fichier test.srt devrait exister")
+        self.assertTrue(os.path.isfile(self.output_mkv), "Le fichier test.mkv devrait exister")
 
         result = subprocess.run(
-            ["mkvmerge", "-i", str(self.output_mkv)],
+            ["ffprobe", "-hide_banner", str(self.output_mkv)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
 
-        tracks = result.stdout.splitlines()
-        tracks.pop(0)
+        
+        tracks = [ 
+            track for track in result.stderr.splitlines()
+            if "stream" in track.lower()
+        ]
+
+        print(f"tracks = {tracks}")
        
         self.assertEqual(len(tracks), 5, "La video devrait comporter 5 pistes")
-        self.assertEqual(tracks[0], "Track ID 0: video (0x44495633 \"DIV3\")", "Le mkv devrait avoir une piste vidéo")
-        self.assertEqual(tracks[1], "Track ID 1: audio (Vorbis)", "Le mkv devrait avoir une piste audio")
-        self.assertEqual(tracks[2], "Track ID 2: subtitles (SubRip/SRT)", "Le mkv devrait avoir une piste sous-titre")
-        self.assertEqual(tracks[3], "Track ID 3: subtitles (SubRip/SRT)", "Le mkv devrait avoir une piste sous-titre")
-        self.assertEqual(tracks[4], "Track ID 4: subtitles (SubRip/SRT)", "Le mkv devrait avoir une piste sous-titre")
+
+        self.assertTrue("Video: msmpeg4v3" in tracks[0], "Le mkv devrait avoir une piste vidéo")
+        self.assertTrue("Audio: vorbis" in tracks[1], "Le mkv devrait avoir une piste audio")
+        self.assertTrue("Subtitle: subrip" in tracks[2], "Le mkv devrait avoir une piste sous-titre")
+        self.assertTrue("Subtitle: subrip" in tracks[3], "Le mkv devrait avoir une piste sous-titre")
+        self.assertTrue("Subtitle: subrip" in tracks[4], "Le mkv devrait avoir une piste sous-titre")
 
     def test_merge_with_output_defined(self):
         """Teste la fonction de merge avec un fichier output sépcifié"""
         add_subtitle_to_mkv(self.mkv_test_file_path, self.srt_file_path, self.output_defined)
 
-        self.assertTrue(os.path.isfile(self.output_defined), "Le fichier test.srt devrait exister")
+        self.assertTrue(os.path.isfile(self.output_defined), "Le fichier test.mkv devrait exister")
 
         result = subprocess.run(
-            ["mkvmerge", "-i", str(self.output_defined)],
+            ["ffprobe", "-hide_banner", str(self.output_defined)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
-
-        tracks = result.stdout.splitlines()
-        tracks.pop(0)
+    
+        tracks = [ 
+            track for track in result.stderr.splitlines()
+            if "stream" in track.lower()
+        ]
+        print(f"tracks = {tracks}")
        
         self.assertEqual(len(tracks), 5, "La video devrait comporter 5 pistes")
-        self.assertEqual(tracks[0], "Track ID 0: video (0x44495633 \"DIV3\")", "Le mkv devrait avoir une piste vidéo")
-        self.assertEqual(tracks[1], "Track ID 1: audio (Vorbis)", "Le mkv devrait avoir une piste audio")
-        self.assertEqual(tracks[2], "Track ID 2: subtitles (SubRip/SRT)", "Le mkv devrait avoir une piste sous-titre")
-        self.assertEqual(tracks[3], "Track ID 3: subtitles (SubRip/SRT)", "Le mkv devrait avoir une piste sous-titre")
-        self.assertEqual(tracks[4], "Track ID 4: subtitles (SubRip/SRT)", "Le mkv devrait avoir une piste sous-titre")
+
+        self.assertTrue("Video: msmpeg4v3" in tracks[0], "Le mkv devrait avoir une piste vidéo")
+        self.assertTrue("Audio: vorbis" in tracks[1], "Le mkv devrait avoir une piste audio")
+        self.assertTrue("Subtitle: subrip" in tracks[2], "Le mkv devrait avoir une piste sous-titre")
+        self.assertTrue("Subtitle: subrip" in tracks[3], "Le mkv devrait avoir une piste sous-titre")
+        self.assertTrue("Subtitle: subrip" in tracks[4], "Le mkv devrait avoir une piste sous-titre")
 
     def test_merge_not_found_srt(self):
         """Teste la fonction de merge avec un fichier srt introuvable"""

@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import subprocess
+import json
 
 def extract_subtitle(mkv_file_str, output_file_str=None):
     # Gestion du fichier source
@@ -19,34 +20,36 @@ def extract_subtitle(mkv_file_str, output_file_str=None):
     print(f"Analyse de {mkv_file_str}")
     try:
         result = subprocess.run(
-            ["mkvmerge", "-i", mkv_file_str],
+            ["ffprobe", "-v", "quiet", "-print_format", "json", "-show_streams", mkv_file_str],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
             check=True
         )
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Erreur lors de l'execution de mkvmerge -i : {e}")
+        raise RuntimeError(f"Erreur lors de l'execution de ffprobe : {e}")
    
-    print(f"Info : {result.stdout}")
+    #print(f"Info : {result.stdout}")
 
     # Récupérer l'ID de la première piste de sous-titre
     # TODO gérer plusieurs pistes de sous titre
-    subtitle_track_id = -1
-    for line in result.stdout.splitlines():
-        if "subtitles" in line.lower():
-            parts = line.split(':', 1)
-            if len(parts) >= 2:
-                track_id = parts[0].split()[2]
-                subtitle_track_id = int(track_id)
-                break
 
+    tracks_json = json.loads(result.stdout)
+
+    subtitle_track_id = -1
+    for stream in tracks_json["streams"] :
+        if stream["codec_type"] == "subtitle":
+            subtitle_track_id = stream["index"]
+            break
+    
     if subtitle_track_id == -1:
         raise ValueError(f"No subtitles tracks found in file : {mkv_file_str}")
 
+    
     print(f"Extraction piste {subtitle_track_id} -> {output_file_str}")
-    subprocess.run([
-        "mkvextract", "tracks",
-        mkv_file_str,
-        f"{subtitle_track_id}:{output_file_str}"
-    ])
+    try:
+        subprocess.run([
+            "ffmpeg", "-i", mkv_file_str, "-map", "0:s:0", "-an", "-vn", output_file_str]
+        )
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Erreur lors de l'execution de ffmpeg -i : {e}")

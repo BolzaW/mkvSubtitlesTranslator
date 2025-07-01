@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 # Install mkvtoolnix
-RUN apt update && apt install -y mkvtoolnix mkvtoolnix-gui
+RUN apt update && apt install -y ffmpeg
 
 # Set working directory
 WORKDIR /app
